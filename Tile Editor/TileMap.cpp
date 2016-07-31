@@ -2,6 +2,7 @@
 
 
 
+
 TileMap::TileMap()
 {
 	setPosition(0, 0);
@@ -10,7 +11,7 @@ TileMap::TileMap()
 void TileMap::placeTiles()
 {
 
-	int row = 0;
+	int row = -1;
 	for (int i = 0, j = 0; i < width*height; i++, j++) {
 		if (i % width == 0) {
 			row++;
@@ -40,6 +41,18 @@ void TileMap::drawTileRects(sf::RenderWindow *window)
 	}
 }
 
+void TileMap::changeTiles(Tile tile)
+{
+	for (int i = 0; i < tileArray.size(); i++)
+	{
+		if (tileArray[i].drawRect && sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		{
+			tileArray[i].sprite.setTextureRect(sf::IntRect(sf::IntRect(tile.rect.getPosition().x, tile.rect.getPosition().y, tile.width, tile.height)));
+			tileArray[i].index = tile.index;
+		}
+	}
+}
+
 void TileMap::checkMouseOverTile(sf::RenderWindow *window)
 {
 	sf::Vector2f converted = window->mapPixelToCoords(sf::Mouse::getPosition(*window));
@@ -64,14 +77,49 @@ void TileMap::draw(sf::RenderWindow *window)
 	}
 }
 
-void TileMap::save()
+void TileMap::save(std::string fileName)
 {
+	std::ofstream mapFile;
+	mapFile.open(fileName);
+	mapFile << width << "\n";
+	mapFile << height << "\n";
+	mapFile << depth << "\n";
 
+	for (int i = 0, j = 0; i < tileArray.size(); i++, j++)
+	{
+		if( i % width == 0)
+		{
+			mapFile << "\n";
+		}
+		mapFile << tileArray[i].index << " ";
+	}
+
+	mapFile.close();
+	std::cout << "Map File Saved To: " << fileName << std::endl;
 }
 
-void TileMap::load()
+void TileMap::load(std::string fileName, sf::Texture *texture, TileMapGuide mapGuide)
 {
+	std::ifstream mapFile;
+	mapFile.open(fileName);
+	mapFile >> width;
+	mapFile >> height;
+	mapFile >> depth;
 
+	for (int i = 0; i < width*height; i++)
+	{
+		Tile tile;
+		tile.sprite.setTexture(*texture);
+		mapFile >> tile.index;
+		//(tiles[i].rect.getPosition().x, tiles[i].rect.getPosition().y, tiles[i].width, tiles[i].height)
+		tile.sprite.setTextureRect(sf::IntRect(mapGuide.tiles[tile.index].rect.getPosition().x, mapGuide.tiles[tile.index].rect.getPosition().y, tile.width,tile.height));
+		
+		tileArray.push_back(tile);
+	}
+
+	mapFile.close();
+	std::cout << "Map Loaded from file: " << fileName << std::endl;
+	placeTiles();
 }
 
 TileMap::~TileMap()
