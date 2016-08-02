@@ -10,7 +10,6 @@ TileMap::TileMap()
 
 void TileMap::placeTiles()
 {
-
 	int row = -1;
 	for (int i = 0, j = 0; i < width*height; i++, j++) {
 		if (i % width == 0) {
