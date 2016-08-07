@@ -10,6 +10,7 @@ private:
 	sf::Texture texture;
 
 public:
+
 	std::vector<Tile> tiles;
 	Tile selectedTile;
 	int rectWidth = 32;

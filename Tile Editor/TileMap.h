@@ -1,11 +1,10 @@
 #pragma once
 #include <iostream>
-#include <vector>
 #include <istream>
 #include <fstream>
 #include "Tile.h"
 #include "TileMapGuide.h"
-
+#include "CollisionMap.h"
 class TileMap : public sf::Transformable
 {
 
@@ -13,6 +12,8 @@ private:
 	
 
 public:
+
+
 	std::vector<Tile> tileArray;
 	int width = 32;
 	int height = 24;

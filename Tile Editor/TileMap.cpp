@@ -49,6 +49,19 @@ void TileMap::changeTiles(Tile tile)
 			tileArray[i].sprite.setTextureRect(sf::IntRect(sf::IntRect(tile.rect.getPosition().x, tile.rect.getPosition().y, tile.width, tile.height)));
 			tileArray[i].index = tile.index;
 		}
+		else if (tileArray[i].drawRect && sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+		{
+			tileArray[i].sprite.setTextureRect(sf::IntRect(0,0,0,0));
+			tileArray[i].index = -1;
+		}
+		else if (tileArray[i].drawRect && sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+		{
+			tileArray[i].collidable = true;
+		}
+		else if (tileArray[i].drawRect && sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+		{
+			tileArray[i].collidable = false;
+		}
 	}
 }
 
@@ -110,9 +123,7 @@ void TileMap::load(std::string fileName, sf::Texture *texture, TileMapGuide mapG
 		Tile tile;
 		tile.sprite.setTexture(*texture);
 		mapFile >> tile.index;
-		//(tiles[i].rect.getPosition().x, tiles[i].rect.getPosition().y, tiles[i].width, tiles[i].height)
-		tile.sprite.setTextureRect(sf::IntRect(mapGuide.tiles[tile.index].rect.getPosition().x, mapGuide.tiles[tile.index].rect.getPosition().y, tile.width,tile.height));
-		
+		tile.sprite.setTextureRect(sf::IntRect(mapGuide.tiles[tile.index].rect.getPosition().x, mapGuide.tiles[tile.index].rect.getPosition().y, tile.width,tile.height));	
 		tileArray.push_back(tile);
 	}
 

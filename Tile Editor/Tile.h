@@ -10,6 +10,7 @@ public:
 	int width = 32;
 	int height = 32;
 	bool drawRect = false;
+	bool collidable = false;
 
 	sf::Texture texture;
 	sf::RectangleShape rect;

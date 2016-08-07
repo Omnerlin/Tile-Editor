@@ -2,6 +2,7 @@
 
 Editor::Editor()
 {
+
 }
 
 void Editor::printMenu()
@@ -29,7 +30,10 @@ void Editor::init()
 
 	int mapChoice = getResponse();
 	std::cout << "Choose the filename: ";
+	std::string prefix = "SavedMaps\\";
 	std::cin >> fileName;
+	prefix += fileName;
+	fileName = prefix;
 	fileName += ".txt";
 
 	if (mapChoice == 1)
@@ -46,13 +50,12 @@ void Editor::init()
 		tileMap.height = mapHeight;
 		tileMap2.height = mapHeight;
 
-		//int mapDepth = 0;
-		//std::cout << "Choose map depth: ";
-		//std::cin >> mapDepth;
 		tileMap.depth = 1;
 		tileMap2.depth = 2;
 		tileMap.newMap(mapTexture);
 		tileMap2.newMap(mapTexture);
+		collisionMap.setup(tileMap.width, tileMap.height);
+
 
 		for (int i = 0; i < tileMap2.tileArray.size(); i++)
 		{
@@ -67,6 +70,22 @@ void Editor::init()
 		load(fileName, mapTexture, mapGuide);
 	}
 
+	font.loadFromFile("Fonts\\gameplay.ttf");
+	currentLayerText.setFont(font);
+	layerOneShown.setFont(font);
+	layerTwoShown.setFont(font);
+
+	currentLayerText.setString("Current Layer: Layer One"); currentLayerText.setCharacterSize(70);
+	layerOneShown.setString("Layer One: Shown"); layerOneShown.setCharacterSize(70);
+	layerTwoShown.setString("Layer Two: Shown"); layerTwoShown.setCharacterSize(70);
+	textRect.setFillColor(sf::Color(0, 0, 0, 50));
+	
+
+	currentLayerText.setPosition(0, 0);
+	layerOneShown.setPosition(0, 120);
+	layerTwoShown.setPosition(0, 240);
+
+
 	window->create(sf::VideoMode(SCREENWIDTH, SCREENHEIGHT), "AdventureGame");
 	window->setVerticalSyncEnabled(true);
 
@@ -76,10 +95,19 @@ void Editor::init()
 	// Set Up Guide View
 	tileMapView.setViewport(sf::FloatRect(0, 0, 0.45, 1));
 
+	// Set up Text ViewPort
+	textView.setSize(window->getDefaultView().getSize());
+	textRect.setSize(sf::Vector2f(textView.getSize().x - 100, textView.getSize().y - 700));
+	textView.setViewport(sf::FloatRect(0.24, 0, 0.4, 0.4));
+
+
+
 	// Set up Map View
-	view.setViewport(sf::FloatRect(0.4, 0, 1, 1));
-	view.setCenter(window->getDefaultView().getCenter().x-100, window->getDefaultView().getCenter().y);
+	view.setViewport(sf::FloatRect(0, 0, 1, 1));
 	view.setSize(window->getDefaultView().getSize().x, window->getDefaultView().getSize().y);
+	view.setCenter(view.getSize().x / 2 - 500, view.getSize().y / 2);
+
+	setupText();
 }
 
 bool Editor::updateCurrentLayer(sf::Time elapsed)
@@ -91,17 +119,119 @@ bool Editor::updateCurrentLayer(sf::Time elapsed)
 		if (currentLayer == 1)
 		{
 			currentLayer = 2;
-			std::cout << "Switched to layer 2" << std::endl;
+			currentLayerText.setString("Current Layer: Layer Two");
 			return true;
 		}
 		else if (currentLayer == 2)
 		{
-			std::cout << "Switched to layer 1" << std::endl;
+			currentLayerText.setString("Current Layer: Layer One");
 			currentLayer = 1;
 			return true;
 		}
 	}
 	return false;
+}
+
+bool Editor::toggleDrawLayerOne(sf::Time elapsed)
+{
+	layerOneToggleTime = elapsed.asSeconds();
+
+	if (layerOneToggleTime > 0.3 && sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+	{
+		if (drawLayerOne == true)
+		{
+			drawLayerOne = false;
+			layerOneShown.setString("Layer One: Hidden");
+			return true;
+		}
+		else if (drawLayerOne == false)
+		{
+			layerOneShown.setString("Layer One: Shown");
+			drawLayerOne = true;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Editor::toggleDrawLayerTwo(sf::Time elapsed)
+{
+	layerTwoToggleTime = elapsed.asSeconds();
+
+	if (layerTwoToggleTime > 0.3 && sf::Keyboard::isKeyPressed(sf::Keyboard::X))
+	{
+		if (drawLayerTwo == true)
+		{
+			drawLayerTwo = false;
+			layerTwoShown.setString("Layer Two: Hidden");
+			return true;
+		}
+		else if (drawLayerTwo == false)
+		{
+			layerTwoShown.setString("Layer Two: Shown");
+			drawLayerTwo = true;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void Editor::drawCollisions() {
+	if (collisionMap.drawRects)
+	{
+		for (int i = 0; i < collisionMap.rects.size(); i++) {
+			if (tileMap.tileArray[i].collidable == true)
+			{
+				window->draw(collisionMap.rects[i]);
+			}
+
+		}
+	}
+}
+
+void Editor::setupText()
+{
+	sf::Text text;
+	text.setFont(font);
+	text.setCharacterSize(20);
+	char letter = 65;
+	sf::Uint8 number = 0;
+
+	for (int i = 0, j = 0; i < tileMap.height; i++, j++)
+	{
+		text.setString(letter);
+		text.setPosition(0 - tileMap.tileArray[i].width, (i * tileMap.tileArray[i].height));
+		gridY.push_back(text);
+		letter++;
+	}
+	for (int i = 0; i < tileMap.width; i++)
+	{
+		text.setString(std::to_string(number));
+		if (number < 10)
+		{
+			text.setPosition((i * tileMap.tileArray[i].width) + tileMap.tileArray[i].width / 4, (0 - tileMap.tileArray[i].height));
+		}
+		else
+		{
+			text.setPosition((i * tileMap.tileArray[i].width), (0 - tileMap.tileArray[i].height));
+		}
+		gridX.push_back(text);
+		number++;
+	}
+
+}
+
+void Editor::drawGridText()
+{
+	for (int i = 0; i < tileMap.width; i++)
+	{
+		window->draw(gridX[i]);
+	}
+	for (int i = 0; i < tileMap.height; i++)
+	{
+		window->draw(gridY[i]);
+	}
 }
 
 void Editor::load(std::string fileName, sf::Texture *texture, TileMapGuide mapGuide)
@@ -113,11 +243,12 @@ void Editor::load(std::string fileName, sf::Texture *texture, TileMapGuide mapGu
 	mapFile >> tileMap.height;
 	mapFile >> tileMap.depth;
 
-	for (int i = 0; i < tileMap.width*tileMap.height; i++)
+	for (int i = 0; i < (tileMap.width*tileMap.height); i++)
 	{
 		Tile tile;
 		tile.sprite.setTexture(*texture);
 		mapFile >> tile.index;
+		mapFile >> tile.collidable;
 		tile.sprite.setTextureRect(sf::IntRect(mapGuide.tiles[tile.index].rect.getPosition().x, mapGuide.tiles[tile.index].rect.getPosition().y, tile.width, tile.height));
 
 		tileMap.tileArray.push_back(tile);
@@ -147,8 +278,9 @@ void Editor::load(std::string fileName, sf::Texture *texture, TileMapGuide mapGu
 	tileMap2.placeTiles();
 
 	mapFile.close();
+	collisionMap.setup(tileMap.width, tileMap.height);
+
 	std::cout << "Map Loaded from file: " << fileName << std::endl;
-	
 }
 
 void Editor::save(std::string fileName)
@@ -166,6 +298,17 @@ void Editor::save(std::string fileName)
 			mapFile << "\n";
 		}
 		mapFile << tileMap.tileArray[i].index << " ";
+
+		if (tileMap.tileArray[i].collidable == true)
+		{
+			mapFile << 1 << " ";
+		}
+		else
+		{
+			mapFile << 0 << " ";
+		}
+
+		
 	}
 
 	mapFile << "\n";
@@ -181,6 +324,7 @@ void Editor::save(std::string fileName)
 			mapFile << "\n";
 		}
 		mapFile << tileMap2.tileArray[i].index << " ";
+		//mapFile << tileMap2.tileArray[i].collidable << " ";
 	}
 
 	mapFile.close();
@@ -191,6 +335,8 @@ void Editor::update()
 {
 	sf::Clock clock;
 	sf::Clock editorClock;
+	sf::Clock layerToggleClock;
+	sf::Clock collisionClock;
 	while (window->isOpen())
 	{
 
@@ -218,19 +364,25 @@ void Editor::update()
 
 		sf::Time elapsed = clock.getElapsedTime();
 		sf::Time editorElapsed = editorClock.getElapsedTime();
-
+		sf::Time layerToggleTime = layerToggleClock.getElapsedTime();
+		sf::Time collisionToggleTime = collisionClock.getElapsedTime();
 
 		if (updateCurrentLayer(editorElapsed) == true)
 		{
 			editorClock.restart();
 		}
 
+		if (toggleDrawLayerOne(layerToggleTime) == true || toggleDrawLayerTwo(layerToggleTime) == true)
+		{
+			layerToggleClock.restart();
+		}
 		
 		if (currentLayer == 1)
 		{
 			tileMap.changeTiles(mapGuide.selectedTile);
 			tileMap.checkMouseOverTile(window);
 		}
+
 		else if (currentLayer == 2) {
 			tileMap2.changeTiles(mapGuide.selectedTile);
 			tileMap2.checkMouseOverTile(window);
@@ -242,7 +394,7 @@ void Editor::update()
 		window->setView(view);
 
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
-
+			
 			if (converted.x > view.getCenter().x)
 			{
 				view.move(-2, 0);
@@ -255,10 +407,11 @@ void Editor::update()
 			{
 				view.move(0, -2);
 			}
-			else if (converted.y > view.getCenter().y)
+			else if (converted.y < view.getCenter().y)
 			{
 				view.move(0, 2);
 			}
+			
 		}
 		
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::T) && elapsed.asSeconds() > 6)
@@ -267,10 +420,33 @@ void Editor::update()
 			clock.restart();
 		}
 
-		tileMap.draw(window);
-		tileMap.drawTileRects(window);
-		tileMap2.draw(window);
-		tileMap2.drawTileRects(window);
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::C) && collisionToggleTime.asSeconds() > 0.5)
+		{
+			if (collisionMap.drawRects == false)
+			{
+				collisionMap.drawRects = true;
+				collisionClock.restart();
+			}
+			else if (collisionMap.drawRects == true)
+			{
+				collisionMap.drawRects = false;
+				collisionClock.restart();
+			}
+		}
+
+
+		if (drawLayerOne == true)
+		{
+			tileMap.draw(window);
+			tileMap.drawTileRects(window);
+		}
+
+		if (drawLayerTwo == true)
+		{
+			tileMap2.draw(window);
+			tileMap2.drawTileRects(window);
+		}
+
 		
 		
 		window->setView(tileMapView);
@@ -279,8 +455,18 @@ void Editor::update()
 		window->draw(mapGuide.sprite);
 		mapGuide.drawRects(window);
 		window->setView(view);
+		drawGridText();
+		window->setView(textView);
+		window->draw(textRect);
+		window->draw(currentLayerText);
+		window->draw(layerOneShown);
+		window->draw(layerTwoShown);
+		window->setView(view);
+		if (collisionMap.drawRects)
+		{
+			drawCollisions();
+		}
 		window->display();
-		//editorClock.restart();
 	}
 }
 

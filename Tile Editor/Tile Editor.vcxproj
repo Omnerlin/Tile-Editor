@@ -149,6 +149,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CollisionMap.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Tile.cpp" />
@@ -156,6 +157,7 @@
     <ClCompile Include="TileMapGuide.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CollisionMap.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="TileMap.h" />

@@ -42,6 +42,7 @@ void TileMapGuide::placeRects()
 			row++;
 			j = 0;
 		}
+
 		tiles[i].rect.setPosition(j * rectWidth, row * rectHeight);
 		tiles[i].sprite.setPosition(tiles[i].rect.getPosition());
 		tiles[i].sprite.setTextureRect(sf::IntRect(tiles[i].rect.getPosition().x, tiles[i].rect.getPosition().y, tiles[i].width,tiles[i].height));
