@@ -11,6 +11,7 @@ private:
 	sf::Text currentLayerText;
 	sf::Text layerOneShown;
 	sf::Text layerTwoShown;
+	sf::Text collisionMapShown;
 	std::vector<sf::Text> gridX;
 	std::vector<sf::Text> gridY;
 

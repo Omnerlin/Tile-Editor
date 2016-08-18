@@ -74,16 +74,19 @@ void Editor::init()
 	currentLayerText.setFont(font);
 	layerOneShown.setFont(font);
 	layerTwoShown.setFont(font);
+	collisionMapShown.setFont(font);
 
 	currentLayerText.setString("Current Layer: Layer One"); currentLayerText.setCharacterSize(70);
 	layerOneShown.setString("Layer One: Shown"); layerOneShown.setCharacterSize(70);
 	layerTwoShown.setString("Layer Two: Shown"); layerTwoShown.setCharacterSize(70);
+	collisionMapShown.setString("Collision Map: Hidden"); collisionMapShown.setCharacterSize(70);
 	textRect.setFillColor(sf::Color(0, 0, 0, 50));
 	
 
 	currentLayerText.setPosition(0, 0);
 	layerOneShown.setPosition(0, 120);
 	layerTwoShown.setPosition(0, 240);
+	collisionMapShown.setPosition(0, 360);
 
 
 	window->create(sf::VideoMode(SCREENWIDTH, SCREENHEIGHT), "AdventureGame");
@@ -97,7 +100,7 @@ void Editor::init()
 
 	// Set up Text ViewPort
 	textView.setSize(window->getDefaultView().getSize());
-	textRect.setSize(sf::Vector2f(textView.getSize().x - 100, textView.getSize().y - 700));
+	textRect.setSize(sf::Vector2f(textView.getSize().x - 100, textView.getSize().y - 600));
 	textView.setViewport(sf::FloatRect(0.24, 0, 0.4, 0.4));
 
 
@@ -425,10 +428,12 @@ void Editor::update()
 			if (collisionMap.drawRects == false)
 			{
 				collisionMap.drawRects = true;
+				collisionMapShown.setString("Collision Map: Shown");
 				collisionClock.restart();
 			}
 			else if (collisionMap.drawRects == true)
 			{
+				collisionMapShown.setString("Collision Map: Hidden");
 				collisionMap.drawRects = false;
 				collisionClock.restart();
 			}
@@ -461,6 +466,7 @@ void Editor::update()
 		window->draw(currentLayerText);
 		window->draw(layerOneShown);
 		window->draw(layerTwoShown);
+		window->draw(collisionMapShown);
 		window->setView(view);
 		if (collisionMap.drawRects)
 		{
