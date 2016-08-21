@@ -3,11 +3,13 @@
 #include "Tile.h"
 #include "TileMap.h"
 #include "TileMapGuide.h"
-
+#include "EnemyManager.h"
 
 class Editor
 {
 private:
+	EnemyManager enemyManager;
+
 	sf::Text currentLayerText;
 	sf::Text layerOneShown;
 	sf::Text layerTwoShown;

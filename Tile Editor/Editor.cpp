@@ -336,6 +336,7 @@ void Editor::save(std::string fileName)
 
 void Editor::update()
 {
+
 	sf::Clock clock;
 	sf::Clock editorClock;
 	sf::Clock layerToggleClock;
@@ -344,6 +345,7 @@ void Editor::update()
 	{
 
 		sf::Event event;
+		sf::Vector2f converted = window->mapPixelToCoords(sf::Mouse::getPosition(*window));
 		while (window->pollEvent(event))
 		{
 
@@ -363,7 +365,29 @@ void Editor::update()
 				}
 				window->setView(view);
 			}
+			if (event.type == sf::Event::KeyReleased)
+			{
+				if (event.key.code == sf::Keyboard::E)
+				{
+					enemyManager.addEnemy(converted.x - Enemy::width / 2, converted.y - Enemy::height / 2);
+				}
+				if (event.key.code == sf::Keyboard::D)
+				{
+					if (enemyManager.enemyArray.size() > 0)
+					{
+						for (int i = 0; i < enemyManager.enemyArray.size(); i++) {
+							if (enemyManager.enemyArray[i].mousedOver) {
+								enemyManager.enemyArray[i].remove = true;
+							}
+						}
+					}
+				}
+			}
 		}
+
+		enemyManager.checkMouseOverEnemies(window);
+		enemyManager.deleteRemovedEnemies();
+		
 
 		sf::Time elapsed = clock.getElapsedTime();
 		sf::Time editorElapsed = editorClock.getElapsedTime();
@@ -393,7 +417,7 @@ void Editor::update()
 
 		window->clear();
 		// Draw and Switch Views
-		sf::Vector2f converted = window->mapPixelToCoords(sf::Mouse::getPosition(*window));
+		
 		window->setView(view);
 
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
@@ -451,7 +475,7 @@ void Editor::update()
 			tileMap2.draw(window);
 			tileMap2.drawTileRects(window);
 		}
-
+		enemyManager.drawEnemies(window);
 		
 		
 		window->setView(tileMapView);

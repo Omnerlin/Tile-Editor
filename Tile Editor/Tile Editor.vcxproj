@@ -154,6 +154,8 @@
   <ItemGroup>
     <ClCompile Include="CollisionMap.cpp" />
     <ClCompile Include="Editor.cpp" />
+    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="EnemyManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TileMap.cpp" />
@@ -162,6 +164,8 @@
   <ItemGroup>
     <ClInclude Include="CollisionMap.h" />
     <ClInclude Include="Editor.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="EnemyManager.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="TileMap.h" />
     <ClInclude Include="TileMapGuide.h" />
